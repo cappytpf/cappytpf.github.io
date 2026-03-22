@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Black Blade Barbershop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --dark: #111111;
+      --card: #161616;
+      --gold: #c9a84c;
+      --gold-light: #e8c96d;
+      --cream: #f5f0e8;
+      --grey: #888;
+      --border: rgba(201,168,76,0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--cream);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 4rem;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+      backdrop-filter: blur(2px);
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--cream);
+      text-decoration: none;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 500;
+      opacity: 0.7;
+      transition: opacity 0.3s, color 0.3s;
+    }
+
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+
+    .nav-cta {
+      background: var(--gold);
+      color: var(--black) !important;
+      padding: 0.6rem 1.4rem;
+      opacity: 1 !important;
+      font-weight: 600 !important;
+      transition: background 0.3s !important;
+    }
+    .nav-cta:hover { background: var(--gold-light) !important; }
+
+    .nav-social {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-left: 1.5rem;
+    }
+
+    .nav-social a {
+      color: var(--cream);
+      opacity: 0.6;
+      transition: opacity 0.3s, color 0.3s;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-social a:hover { opacity: 1; color: var(--gold); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 0 4rem;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 70% 50%, rgba(201,168,76,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 60%),
+        linear-gradient(135deg, #0a0a0a 0%, #111 100%);
+    }
+
+    .hero-lines {
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 50%;
+      opacity: 0.06;
+      background-image: repeating-linear-gradient(
+        90deg,
+        var(--gold) 0px,
+        var(--gold) 1px,
+        transparent 1px,
+        transparent 60px
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 700px;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.4s forwards;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: rgba(245,240,232,0.6);
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.6s forwards;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.8s forwards;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: var(--black);
+      padding: 1rem 2.2rem;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--cream);
+      padding: 1rem 2.2rem;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border: 1px solid rgba(245,240,232,0.25);
+      cursor: pointer;
+      transition: border-color 0.3s, color 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    .hero-stats {
+      position: absolute;
+      bottom: 3rem;
+      right: 4rem;
+      display: flex;
+      gap: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 1s forwards;
+    }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin-top: 0.3rem;
+    }
+
+    /* ── GOLD DIVIDER ── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity: 0.4;
+    }
+
+    /* ── ABOUT ── */
+    #about {
+      padding: 8rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+      position: relative;
+    }
+
+    .about-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+    }
+
+    .about-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 1.8rem;
+    }
+
+    .about-text {
+      font-size: 1rem;
+      line-height: 1.9;
+      color: rgba(245,240,232,0.65);
+      margin-bottom: 1.2rem;
+    }
+
+    .about-image-wrapper {
+      position: relative;
+    }
+
+    .about-image-box {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: var(--card);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .about-image-placeholder {
+      font-family: 'Playfair Display', serif;
+      font-size: 6rem;
+      opacity: 0.06;
+      user-select: none;
+    }
+
+    .about-image-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,0.08), transparent 60%);
+    }
+
+    .about-accent {
+      position: absolute;
+      bottom: -2rem;
+      left: -2rem;
+      width: 60%;
+      height: 60%;
+      border: 1px solid rgba(201,168,76,0.2);
+      z-index: -1;
+    }
+
+    /* ── BARBERS ── */
+    #barbers {
+      padding: 8rem 4rem;
+      background: var(--dark);
+      position: relative;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 5rem;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+    }
+
+    .barbers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .barber-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 0;
+      overflow: hidden;
+      transition: transform 0.4s, border-color 0.4s;
+      cursor: pointer;
+    }
+
+    .barber-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(201,168,76,0.5);
+    }
+
+    .barber-book-hint {
+      display: block;
+      margin-top: 1.2rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .barber-card:hover .barber-book-hint { opacity: 1; }
+
+    .barber-photo {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: #1a1a1a;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .barber-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, var(--card) 0%, transparent 50%);
+    }
+
+    .barber-photo-gradient {
+      position: absolute;
+      inset: 0;
+    }
+
+    .barber-card:nth-child(1) .barber-photo-gradient {
+      background: radial-gradient(ellipse at 30% 30%, rgba(201,168,76,0.12), transparent 70%);
+    }
+    .barber-card:nth-child(2) .barber-photo-gradient {
+      background: radial-gradient(ellipse at 70% 20%, rgba(201,168,76,0.10), transparent 70%);
+    }
+    .barber-card:nth-child(3) .barber-photo-gradient {
+      background: radial-gradient(ellipse at 50% 40%, rgba(201,168,76,0.08), transparent 70%);
+    }
+
+    .barber-info {
+      padding: 1.8rem;
+    }
+
+    .barber-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .barber-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .barber-bio {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: rgba(245,240,232,0.55);
+      margin-bottom: 1.2rem;
+    }
+
+    .barber-specialties {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .specialty-tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid var(--border);
+      color: var(--gold);
+    }
+
+    /* ── SERVICES ── */
+    #services {
+      padding: 8rem 4rem;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 4rem;
+    }
+
+    .service-item {
+      background: var(--black);
+      padding: 2.5rem 2rem;
+      transition: background 0.3s;
+    }
+
+    .service-item:hover { background: var(--card); }
+
+    .service-icon {
+      font-size: 1.8rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .service-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .service-desc {
+      font-size: 0.88rem;
+      color: rgba(245,240,232,0.5);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .service-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--gold);
+    }
+
+    /* ── BOOKING ── */
+    #rezervacija {
+      padding: 8rem 4rem;
+      background: var(--dark);
+      position: relative;
+    }
+
+    #rezervacija::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity: 0.3;
+    }
+
+    .booking-wrapper {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .booking-wrapper .section-header {
+      text-align: left;
+      margin-bottom: 3rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+
+    input, select, textarea {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--cream);
+      padding: 0.9rem 1.2rem;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 300;
+      outline: none;
+      transition: border-color 0.3s;
+      width: 100%;
+      appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--gold);
+    }
+
+    select option {
+      background: var(--card);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-submit {
+      margin-top: 2rem;
+    }
+
+    .btn-submit {
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      padding: 1.1rem 3rem;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      width: 100%;
+    }
+
+    .btn-submit:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+    .form-note {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--grey);
+      text-align: center;
+    }
+
+    /* ── SUCCESS MESSAGE ── */
+    .success-msg {
+      display: none;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.4);
+      padding: 1.5rem 2rem;
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .success-msg.show { display: block; }
+
+    .success-msg p {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 4rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .footer-info {
+      font-size: 0.85rem;
+      color: var(--grey);
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .footer-hours {
+      font-size: 0.85rem;
+      color: var(--grey);
+      text-align: right;
+      line-height: 1.8;
+    }
+
+    .footer-hours span { color: var(--cream); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── GALLERY ── */
+    #galerija {
+      padding: 8rem 4rem;
+      background: var(--black);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto auto;
+      gap: 0.8rem;
+      margin-top: 4rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .gallery-item:first-child {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+      min-height: 200px;
+    }
+
+    .gallery-item:first-child img { min-height: 420px; }
+
+    .gallery-item:hover img { transform: scale(1.06); }
+
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,0.7) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      display: flex;
+      align-items: flex-end;
+      padding: 1.2rem;
+    }
+
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+    .gallery-overlay span {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* ── FOOTER SOCIAL ── */
+    .footer-social {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 0.8rem;
+    }
+
+    .footer-social a {
+      color: var(--grey);
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-social a:hover { color: var(--gold); }
+
+    @media (max-width: 900px) {
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .gallery-item:first-child { grid-column: span 2; }
+      #galerija { padding: 5rem 2rem; }
+    }
+    .scroll-line {
+      position: absolute;
+      bottom: 3rem;
+      left: 4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 1.2s forwards;
+    }
+
+    .scroll-line::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      animation: expandLine 1.5s 1.5s ease infinite;
+    }
+
+    .scroll-text {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+
+    @keyframes expandLine {
+      0%,100% { width: 40px; opacity: 0.5; }
+      50% { width: 70px; opacity: 1; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 2rem; }
+      .nav-links { display: none; }
+      #hero { padding: 0 2rem; }
+      #about { grid-template-columns: 1fr; gap: 3rem; padding: 5rem 2rem; }
+      #barbers, #services, #rezervacija { padding: 5rem 2rem; }
+      .barbers-grid { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 2rem; text-align: center; }
+      .footer-hours { text-align: center; }
+      .hero-stats { display: none; }
+      .scroll-line { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Black Blade</div>
+    <ul class="nav-links">
+      <li><a href="#about">O nas</a></li>
+      <li><a href="#barbers">Barberji</a></li>
+      <li><a href="#services">Storitve</a></li>
+      <li><a href="#rezervacija" class="nav-cta">Rezerviraj</a></li>
+    </ul>
+    <div class="nav-social">
+      <a href="https://instagram.com/blackblade_lj" target="_blank" title="Instagram">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="https://tiktok.com/@blackblade_lj" target="_blank" title="TikTok">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-lines"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">✦ Ljubljana, Slovenija ✦</p>
+      <h1 class="hero-title">Umetnost<br><em>brivništva.</em></h1>
+      <p class="hero-desc">
+        Dobrodošli v Black Blade — mestu, kjer tradicija sreča sodoben stil. Vsak rez je prečiščen do popolnosti, vsak obisk pa izkušnja.
+      </p>
+      <div class="hero-buttons">
+        <a href="#rezervacija" class="btn-primary">Rezerviraj termin</a>
+        <a href="#barbers" class="btn-secondary">Spoznaj ekipo</a>
+      </div>
+    </div>
+    <div class="scroll-line">
+      <span class="scroll-text">Pomakni navzdol</span>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">8+</div>
+        <div class="stat-label">Let izkušenj</div>
+      </div>
+      <div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">Mojstri</div>
+      </div>
+      <div>
+        <div class="stat-num">2k+</div>
+        <div class="stat-label">Zadovoljnih strank</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-text-col reveal">
+      <p class="about-label">Naša zgodba</p>
+      <h2 class="about-title">Več kot le striženje. <em>Ritual.</em></h2>
+      <p class="about-text">
+        Black Blade Barbershop je bil ustanovljen z eno samo mislijo — da si vsak moški zasluži izkušnjo, ki ga osvobodi rutine in ga povrne k samemu sebi. Naša brivnica ni le prostor za striženje las, je zatočišče.
+      </p>
+      <p class="about-text">
+        Kombiniramo klasične brivske tehnike z modernim pristopom k stilu. Od klasičnega brijanja z ravnim britivom do natančnih modernih rezov — vsak obisk je prilagojen tebi.
+      </p>
+      <a href="#rezervacija" class="btn-primary" style="margin-top:1rem; display: inline-block;">Rezerviraj zdaj</a>
+    </div>
+    <div class="about-image-wrapper reveal">
+      <div class="about-image-box">
+        <div class="about-image-placeholder">✂</div>
+      </div>
+      <div class="about-accent"></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- BARBERS -->
+  <section id="barbers">
+    <div class="section-header reveal">
+      <p class="section-label">Naša ekipa</p>
+      <h2 class="section-title">Spoznaj mojstre</h2>
+    </div>
+    <div class="barbers-grid">
+
+      <div class="barber-card reveal" data-barber="marko">
+        <div class="barber-photo">
+          <div class="barber-photo-gradient"></div>
+          <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80" alt="Marko Novak barber" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:0;" />
+        </div>
+        <div class="barber-info">
+          <h3 class="barber-name">Marko Novak</h3>
+          <p class="barber-title">Head Barber & Lastnik</p>
+          <p class="barber-bio">S preko 12 leti izkušenj je Marko srce Black Blade. Specializiran za klasično brijanje in precizne fade rez, ki jih izvaja z artizmom pravega mojstra.</p>
+          <div class="barber-specialties">
+            <span class="specialty-tag">Klasično brijanje</span>
+            <span class="specialty-tag">Fade</span>
+            <span class="specialty-tag">Brada</span>
+          </div>
+          <span class="barber-book-hint">→ Klikni za rezervacijo</span>
+        </div>
+      </div>
+
+      <div class="barber-card reveal" data-barber="luka">
+        <div class="barber-photo">
+          <div class="barber-photo-gradient"></div>
+          <img src="https://images.unsplash.com/photo-1521490683712-35a1cb235d1c?w=600&q=80" alt="Luka Horvat barber" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:0;" />
+        </div>
+        <div class="barber-info">
+          <h3 class="barber-name">Luka Horvat</h3>
+          <p class="barber-title">Senior Barber</p>
+          <p class="barber-bio">Luka je specialist za sodobne rese in oblikovanje brade. Njegova strast do geometrije in natančnosti se odraža v vsakem rezu — čist, oster, brez kompromisov.</p>
+          <div class="barber-specialties">
+            <span class="specialty-tag">Modern cuts</span>
+            <span class="specialty-tag">Oblikovanje brade</span>
+            <span class="specialty-tag">Tekstura</span>
+          </div>
+          <span class="barber-book-hint">→ Klikni za rezervacijo</span>
+        </div>
+      </div>
+
+      <div class="barber-card reveal" data-barber="nik">
+        <div class="barber-photo">
+          <div class="barber-photo-gradient"></div>
+          <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=600&q=80" alt="Nik Krajnc barber" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:0;" />
+        </div>
+        <div class="barber-info">
+          <h3 class="barber-name">Nik Krajnc</h3>
+          <p class="barber-title">Barber & Stilist</p>
+          <p class="barber-bio">Najmlajši v ekipi a z izjemnim talentom. Nik prinaša svežino in sodobne trende — od skin fade do kreativnih dizajnov, ki naredijo izjavo.</p>
+          <div class="barber-specialties">
+            <span class="specialty-tag">Skin fade</span>
+            <span class="specialty-tag">Hair designs</span>
+            <span class="specialty-tag">Styling</span>
+          </div>
+          <span class="barber-book-hint">→ Klikni za rezervacijo</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="section-header reveal">
+      <p class="section-label">Cenik</p>
+      <h2 class="section-title">Naše storitve</h2>
+    </div>
+    <div class="services-grid">
+      <div class="service-item reveal">
+        <div class="service-icon">✂️</div>
+        <h3 class="service-name">Striženje las</h3>
+        <p class="service-desc">Klasično ali moderno striženje, prilagojeno tvoji strukturi obraza in osebnemu stilu.</p>
+        <div class="service-price">od 18€</div>
+      </div>
+      <div class="service-item reveal">
+        <div class="service-icon">🪒</div>
+        <h3 class="service-name">Klasično brijanje</h3>
+        <p class="service-desc">Tradicionalno brijanje z ravnim britivom, vročo brisačo in pomirjujočimi balzami.</p>
+        <div class="service-price">od 22€</div>
+      </div>
+      <div class="service-item reveal">
+        <div class="service-icon">🧔</div>
+        <h3 class="service-name">Oblikovanje brade</h3>
+        <p class="service-desc">Natančno oblikovanje in urejanje brade za popolno definicijo tvojega videza.</p>
+        <div class="service-price">od 14€</div>
+      </div>
+      <div class="service-item reveal">
+        <div class="service-icon">👑</div>
+        <h3 class="service-name">Komplet – Cut & Shave</h3>
+        <p class="service-desc">Striženje las in popolno brijanje — popolna izkušnja Black Blade v enem obisku.</p>
+        <div class="service-price">od 35€</div>
+      </div>
+      <div class="service-item reveal">
+        <div class="service-icon">⚡</div>
+        <h3 class="service-name">Fade & Design</h3>
+        <p class="service-desc">Precizni fade rezi in kreativni vzorci za tiste, ki hočejo izstopati.</p>
+        <div class="service-price">od 25€</div>
+      </div>
+      <div class="service-item reveal">
+        <div class="service-icon">✨</div>
+        <h3 class="service-name">Tretma las</h3>
+        <p class="service-desc">Negovanje in hidratacija las s premium proizvodi za zdrave in sijoče lase.</p>
+        <div class="service-price">od 20€</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- GALLERY -->
+  <section id="galerija">
+    <div class="section-header reveal">
+      <p class="section-label">Naše delo</p>
+      <h2 class="section-title">Galerija</h2>
+    </div>
+    <div class="gallery-grid reveal">
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=800&q=80" alt="Fade haircut" />
+        <div class="gallery-overlay"><span>Skin Fade</span></div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=600&q=80" alt="Beard trim" />
+        <div class="gallery-overlay"><span>Brada</span></div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=600&q=80" alt="Classic cut" />
+        <div class="gallery-overlay"><span>Classic Cut</span></div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80" alt="Barbershop" />
+        <div class="gallery-overlay"><span>Barbershop</span></div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1593702288056-7cc4e6a78ebe?w=600&q=80" alt="Haircut result" />
+        <div class="gallery-overlay"><span>Modern Cut</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- BOOKING -->
+  <section id="rezervacija">
+    <div class="booking-wrapper">
+      <div class="section-header reveal">
+        <p class="section-label">Tvoj termin</p>
+        <h2 class="section-title">Rezerviraj termin</h2>
+        <p style="margin-top:1rem; color:rgba(245,240,232,0.55); font-size:0.95rem;">Izpolni obrazec in mi potrdimo termin v 24 urah.</p>
+      </div>
+
+      <form id="booking-form" class="reveal">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ime">Ime in priimek</label>
+            <input type="text" id="ime" placeholder="Janez Novak" required />
+          </div>
+          <div class="form-group">
+            <label for="tel">Telefonska številka</label>
+            <input type="tel" id="tel" placeholder="+386 41 000 000" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="barber">Izberi barberja</label>
+            <select id="barber" required>
+              <option value="" disabled selected>Izberi barberja</option>
+              <option value="marko">Marko Novak</option>
+              <option value="luka">Luka Horvat</option>
+              <option value="nik">Nik Krajnc</option>
+              <option value="karkoli">Ni važno</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="storitev">Storitev</label>
+            <select id="storitev" required>
+              <option value="" disabled selected>Izberi storitev</option>
+              <option value="strizenje">Striženje las</option>
+              <option value="brijanje">Klasično brijanje</option>
+              <option value="brada">Oblikovanje brade</option>
+              <option value="komplet">Komplet – Cut & Shave</option>
+              <option value="fade">Fade & Design</option>
+              <option value="tretma">Tretma las</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="datum">Datum</label>
+            <input type="date" id="datum" required />
+          </div>
+          <div class="form-group">
+            <label for="cas">Želena ura</label>
+            <select id="cas" required>
+              <option value="" disabled selected>Izberi uro</option>
+              <option>09:00</option>
+              <option>09:30</option>
+              <option>10:00</option>
+              <option>10:30</option>
+              <option>11:00</option>
+              <option>11:30</option>
+              <option>12:00</option>
+              <option>13:00</option>
+              <option>13:30</option>
+              <option>14:00</option>
+              <option>14:30</option>
+              <option>15:00</option>
+              <option>15:30</option>
+              <option>16:00</option>
+              <option>16:30</option>
+              <option>17:00</option>
+              <option>17:30</option>
+              <option>18:00</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full">
+            <label for="sporocilo">Posebne želje (neobvezno)</label>
+            <textarea id="sporocilo" placeholder="Napiši nam svoje posebne želje ali vprašanja..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-submit">
+          <button type="submit" class="btn-submit">Potrdi rezervacijo ✦</button>
+          <p class="form-note">Potrditev boste prejeli po telefonu v roku 24 ur.</p>
+        </div>
+      </form>
+
+      <div class="success-msg" id="success-msg">
+        <p>✦ Hvala! Vaša rezervacija je bila uspešno poslana. ✦</p>
+        <p style="font-size:0.85rem; color:rgba(245,240,232,0.6); margin-top:0.5rem; font-family:'Barlow',sans-serif; font-weight:300;">Potrdit vas bomo v roku 24 ur.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Black Blade</div>
+    <div class="footer-info">
+      © 2025 Black Blade Barbershop<br/>
+      Trubarjeva ulica 12, Ljubljana
+      <div class="footer-social">
+        <a href="https://instagram.com/blackblade_lj" target="_blank" title="Instagram">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://tiktok.com/@blackblade_lj" target="_blank" title="TikTok">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-hours">
+      <span>Pon–Pet:</span> 09:00 – 19:00<br/>
+      <span>Sob:</span> 09:00 – 15:00<br/>
+      <span>Ned:</span> Zaprto
+    </div>
+  </footer>
+
+  <script>
+    // ── Barber card click → scroll to form & select barber ──
+    document.querySelectorAll('.barber-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const barberValue = card.getAttribute('data-barber');
+        const select = document.getElementById('barber');
+        select.value = barberValue;
+        // highlight the select briefly
+        select.style.borderColor = 'var(--gold)';
+        select.style.transition = 'border-color 0.3s';
+        setTimeout(() => select.style.borderColor = '', 2000);
+        document.getElementById('rezervacija').scrollIntoView({ behavior: 'smooth' });
+      });
+      card.style.cursor = 'pointer';
+    });
+
+    // ── Scroll reveal ──
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, 100);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    // ── Set min date for booking ──
+    const dateInput = document.getElementById('datum');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+
+    // ── Form submit ──
+    document.getElementById('booking-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      this.style.opacity = '0';
+      this.style.transition = 'opacity 0.4s';
+      setTimeout(() => {
+        this.style.display = 'none';
+        document.getElementById('success-msg').classList.add('show');
+      }, 400);
+    });
+
+    // ── Nav background on scroll ──
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('nav');
+      if (window.scrollY > 80) {
+        nav.style.background = 'rgba(10,10,10,0.97)';
+        nav.style.backdropFilter = 'blur(10px)';
+      } else {
+        nav.style.background = 'linear-gradient(to bottom, rgba(10,10,10,0.95), transparent)';
+        nav.style.backdropFilter = 'blur(2px)';
+      }
+    });
+  </script>
+</body>
+</html>
